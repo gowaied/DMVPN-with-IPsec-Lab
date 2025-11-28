@@ -6,7 +6,7 @@ This lab simulates a secure enterprise network using **DMVPN Phase 2** with **IP
 
 ## 📷 Topology Diagram
 
-Refer to `topology.png` for a visual overview of the lab setup.
+![Topology](topology.png)
 
 - **HQ Router**  
   - LAN: `10.0.1.0/24`  
