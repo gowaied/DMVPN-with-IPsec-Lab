@@ -1,0 +1,153 @@
+
+!
+! Last configuration change at 02:47:20 UTC Thu Dec 4 2025
+!
+version 17.12
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname BR2-Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+login on-success log
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-67108912
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-67108912
+ revocation-check none
+ rsakeypair TP-self-signed-67108912
+ hash sha256
+!
+!
+crypto pki certificate chain TP-self-signed-67108912
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+!
+!
+memory free low-watermark processor 81225
+!
+!
+spanning-tree mode rapid-pvst
+!
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 1
+ encryption aes
+ hash sha256
+ authentication pre-share
+ group 21
+crypto isakmp key cisco123 address 0.0.0.0        
+!
+!
+crypto ipsec transform-set BR2-set esp-aes esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile PROF1
+ set transform-set BR2-set 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Tunnel0
+ ip address 172.16.0.3 255.255.255.0
+ no ip redirects
+ ip nhrp authentication cisco123
+ ip nhrp map 172.16.0.1 192.168.81.222
+ ip nhrp map multicast 192.168.81.222
+ ip nhrp network-id 1234
+ ip nhrp nhs 172.16.0.1
+ tunnel source 192.168.81.137
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile PROF1
+!
+interface Ethernet0/0
+ ip dhcp client client-id ascii cisco-aabb.cc00.3000-Et0/0
+ ip address dhcp
+!
+interface Ethernet0/1
+ ip address 10.0.3.1 255.255.255.0
+ ip helper-address 172.16.0.1
+!
+interface Ethernet0/2
+ no ip address
+!
+interface Ethernet0/3
+ no ip address
+!
+!
+router eigrp 100
+ network 10.0.0.0
+ network 172.16.0.0
+!
+ip forward-protocol nd
+!
+!
+ip http server
+ip http secure-server
+ip http client source-interface Ethernet0/0
+ip ssh bulk-mode 131072
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input ssh
+!
+!
+!
+!
+end

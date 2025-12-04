@@ -1,0 +1,165 @@
+
+!
+! Last configuration change at 02:32:45 UTC Thu Dec 4 2025
+!
+version 17.12
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname HQ-Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip dhcp excluded-address 10.0.2.1
+ip dhcp excluded-address 10.0.3.1
+ip dhcp excluded-address 10.0.4.1
+ip dhcp excluded-address 10.0.1.1
+!
+ip dhcp pool BR1
+ network 10.0.2.0 255.255.255.0
+ default-router 10.0.2.1 
+ dns-server 192.168.81.2 
+!
+ip dhcp pool BR2
+ network 10.0.3.0 255.255.255.0
+ default-router 10.0.3.1 
+ dns-server 192.168.81.2 
+!
+ip dhcp pool BR3
+ network 10.0.4.0 255.255.255.0
+ dns-server 192.168.81.2 
+ default-router 10.0.4.1 
+!
+ip dhcp pool HQ
+ network 10.0.1.0 255.255.255.0
+ default-router 10.0.1.1 
+ dns-server 192.168.81.2 
+!
+!
+!
+ip cef
+login on-success log
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+memory free low-watermark processor 81225
+!
+!
+spanning-tree mode rapid-pvst
+!
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 1
+ encryption aes
+ hash sha256
+ authentication pre-share
+ group 21
+crypto isakmp key cisco123 address 0.0.0.0        
+!
+!
+crypto ipsec transform-set HQ-set esp-aes esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile PROF1
+ set transform-set HQ-set 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Tunnel0
+ ip address 172.16.0.1 255.255.255.0
+ no ip redirects
+ no ip split-horizon eigrp 100
+ ip nhrp authentication cisco123
+ ip nhrp network-id 1234
+ ip nhrp redirect
+ tunnel source 192.168.81.222
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile PROF1
+!
+interface Ethernet0/0
+ ip dhcp client client-id ascii cisco-aabb.cc00.1000-Et0/0
+ ip address dhcp
+!
+interface Ethernet0/1
+ ip address 10.0.1.1 255.255.255.0
+!
+interface Ethernet0/2
+ no ip address
+!
+interface Ethernet0/3
+ no ip address
+!
+!
+router eigrp 100
+ network 10.0.0.0
+ network 172.16.0.0
+!
+ip forward-protocol nd
+!
+!
+ip http server
+ip http secure-server
+ip http client source-interface Ethernet0/0
+ip ssh bulk-mode 131072
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input ssh
+!
+!
+!
+!
+end
